@@ -1,30 +1,493 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Incidències Institut Joan Oró</title>
-    <script defer src="Codi.js"></script>
-    <link rel="stylesheet" type="text/css" href="gameDictado.css">
-</head>
-<body>
+<!doctype html>
+<html lang="ca">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Gestor d'incidències de l'Institut Joan Oró"
+    />
+    <title>Gestió d'incidències · Institut Joan Oró</title>
+    <link rel="stylesheet" href="styles.css?v=1" />
+    <script defer src="app.js?v=1"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand-row">
+        <a class="brand" href="#" aria-label="Inici del gestor">
+          <span class="brand-mark" aria-hidden="true">JO</span>
+          <span>
+            <strong>Institut Joan Oró</strong>
+            <small>Gestió d’incidències</small>
+          </span>
+        </a>
+        <span class="test-badge">Gestió interna</span>
+      </div>
 
-<ul style="list-style-type: none; margin: 0; padding: 0; overflow: hidden; background-color: black;">
- 	<li style="border-right: 3px solid #bbb; float: left; padding: 14px 16px; font-weight: bold;"><a href="https://forms.gle/C8WsVEomW4PQEwif8" style="color: #dd4b39; text-decoration: none;">Incidències Centre</a></li>
- 	<li style="border-right: 3px solid #bbb; float: left; padding: 14px 16px; font-weight: bold;"><a href="https://forms.gle/HGeRNFnLzKPocV579" style="color: #dd4b39; text-decoration: none;">Incidències Alumnes</a></li>
- 	<li style="background-color: #ccc; border-right: 3px solid #bbb; float: left; padding: 14px 16px; font-weight: bold;"><a href="#" style="color: #dd4b39; text-decoration: none;">Gestió Incidències</a></li>
-</ul>
-&nbsp;
-<div id="container">
-    <div class="row">
-        <h2 style="text-align:center">Inicieu sessió per gestionar les incidències</h2>
-        <div class="col">    
-            <input type="text" name="username" placeholder="Usuari" required>
-            <input type="password" name="password" placeholder="Contrasenya" required>
-            <button id="Btn" class="enviar" type="button">Login</button>
+      <nav class="main-nav" aria-label="Accessos d'incidències">
+        <a
+          href="https://forms.gle/C8WsVEomW4PQEwif8"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Incidències del centre
+        </a>
+        <a
+          href="https://forms.gle/HGeRNFnLzKPocV579"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Incidències de l’alumnat
+        </a>
+        <a class="active" href="#">Gestió interna</a>
+      </nav>
+    </header>
+
+    <main>
+      <section id="login-view" class="login-shell" aria-labelledby="login-title">
+        <div class="login-copy">
+          <p class="eyebrow">Gestió interna</p>
+          <h1 id="login-title">Tot el seguiment, en un lloc més clar.</h1>
+          <p>
+            Consulta, reassigna i documenta les incidències amb el mateix flux
+            de treball del centre.
+          </p>
+          <ul>
+            <li>Només apareixen les incidències del teu perfil.</li>
+            <li>Els canvis queden protegits i es desen automàticament.</li>
+            <li>Cada desament conserva la traçabilitat.</li>
+          </ul>
         </div>
-    </div>
-</div>
 
-</body>
+        <form id="login-form" class="login-card">
+          <div>
+            <p class="eyebrow">Accés</p>
+            <h2>Inicia sessió</h2>
+            <p class="muted">Usuari i contrasenya, com fins ara.</p>
+          </div>
+
+          <label>
+            Usuari
+            <input
+              id="login-user"
+              name="username"
+              autocomplete="username"
+              required
+            />
+          </label>
+
+          <label>
+            Contrasenya
+            <div class="password-field">
+              <input
+                id="login-password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+              />
+              <button
+                id="toggle-password"
+                class="text-button"
+                type="button"
+                aria-label="Mostrar la contrasenya"
+              >
+                Mostrar
+              </button>
+            </div>
+          </label>
+
+          <p id="login-error" class="form-error" role="alert"></p>
+          <button class="primary-button" type="submit">Entrar</button>
+
+          <div class="demo-note">
+            <strong>Accés intern del centre</strong>
+            <span>Utilitza l’usuari i la contrasenya facilitats.</span>
+          </div>
+        </form>
+      </section>
+
+      <section id="app-view" class="app-shell" hidden>
+        <div class="workspace-header">
+          <div>
+            <p class="eyebrow">Panell intern</p>
+            <h1>Incidències del teu perfil</h1>
+            <p id="workspace-subtitle" class="muted"></p>
+          </div>
+
+          <div class="account-actions">
+            <div class="user-chip">
+              <span id="user-initials" class="avatar">A</span>
+              <span>
+                <strong id="current-user-name">Albert</strong>
+                <small id="current-user-role">Administrador</small>
+              </span>
+            </div>
+            <button id="admin-button" class="secondary-button" type="button">
+              Administrar
+            </button>
+            <button id="logout-button" class="ghost-button" type="button">
+              Tancar sessió
+            </button>
+          </div>
+        </div>
+
+        <div class="demo-toolbar">
+          <div>
+            <strong>Canvis protegits</strong>
+            <span id="connection-status">Connectat amb el full del centre.</span>
+            <small id="autosave-status">Desament automàtic activat.</small>
+          </div>
+          <label>
+            Veure com
+            <select id="profile-preview"></select>
+          </label>
+          <button id="reset-demo-button" class="ghost-button compact" type="button" hidden>
+            Reiniciar prova
+          </button>
+        </div>
+
+        <section class="summary-grid" aria-label="Resum d'incidències">
+          <article>
+            <span class="summary-icon red" aria-hidden="true">!</span>
+            <span>
+              <strong id="urgent-count">0</strong>
+              <small>Urgents</small>
+            </span>
+          </article>
+          <article>
+            <span class="summary-icon amber" aria-hidden="true">⌛</span>
+            <span>
+              <strong id="pending-count">0</strong>
+              <small>Pendents</small>
+            </span>
+          </article>
+          <article>
+            <span class="summary-icon blue" aria-hidden="true">→</span>
+            <span>
+              <strong id="assigned-count">0</strong>
+              <small>Assignades</small>
+            </span>
+          </article>
+          <article>
+            <span class="summary-icon green" aria-hidden="true">✓</span>
+            <span>
+              <strong id="solved-count">0</strong>
+              <small>Solucionades</small>
+            </span>
+          </article>
+        </section>
+
+        <section class="filter-panel" aria-label="Filtres">
+          <div class="quick-filters" role="group" aria-label="Filtre ràpid">
+            <button class="filter-chip active" data-quick-filter="pending" type="button">
+              Pendents
+            </button>
+            <button class="filter-chip" data-quick-filter="urgent" type="button">
+              Urgents
+            </button>
+            <button class="filter-chip" data-quick-filter="all" type="button">
+              Totes
+            </button>
+          </div>
+
+          <label class="search-field">
+            <span class="sr-only">Buscar</span>
+            <input
+              id="search-input"
+              type="search"
+              placeholder="Buscar per aula, grup o descripció…"
+            />
+          </label>
+
+          <label id="type-filter-label">
+            Tipus
+            <select id="type-filter">
+              <option value="">Tots</option>
+              <option>Informàtica</option>
+              <option>Manteniment</option>
+              <option>Altres</option>
+            </select>
+          </label>
+        </section>
+
+        <div class="list-heading">
+          <div>
+            <h2>Incidències</h2>
+            <p id="result-count" class="muted"></p>
+          </div>
+          <div class="legend">
+            <span><i class="dot urgent"></i> Urgent</span>
+            <span><i class="dot changed"></i> Canvi pendent</span>
+            <button id="print-button" class="secondary-button compact" type="button" hidden>
+              Imprimir
+            </button>
+          </div>
+        </div>
+
+        <section id="incident-list" class="incident-list" aria-live="polite"></section>
+
+        <div id="empty-state" class="empty-state" hidden>
+          <span aria-hidden="true">✓</span>
+          <h2>No hi ha incidències amb aquests filtres</h2>
+          <p>Prova de seleccionar “Totes” o canviar el text de cerca.</p>
+        </div>
+
+        <div id="save-bar" class="save-bar" hidden>
+          <div>
+            <strong id="save-summary">0 canvis pendents</strong>
+            <span>Només es registraran els valors que realment han canviat.</span>
+          </div>
+          <button id="discard-button" class="ghost-button light" type="button">
+            Descartar
+          </button>
+          <button id="save-button" class="save-button" type="button">
+            Desar canvis
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="admin-dialog" class="admin-dialog">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow">Administració</p>
+          <h2>Configuració bàsica</h2>
+          <p class="muted">Usuaris, contrasenyes, perfils i recorreguts.</p>
+        </div>
+        <button class="icon-button" data-close-dialog="admin-dialog" type="button">
+          <span class="sr-only">Tancar</span>×
+        </button>
+      </div>
+
+      <div class="admin-tabs" role="tablist">
+        <button
+          class="admin-tab active"
+          data-admin-tab="users"
+          type="button"
+          role="tab"
+        >
+          Usuaris
+        </button>
+        <button
+          class="admin-tab"
+          data-admin-tab="profiles"
+          type="button"
+          role="tab"
+        >
+          Perfils i recorreguts
+        </button>
+      </div>
+
+      <section id="admin-users-panel" class="admin-panel">
+        <div class="panel-title">
+          <div>
+            <h3>Usuaris del panell</h3>
+            <p class="muted">Desactivar conserva tot l’històric anterior.</p>
+          </div>
+          <button id="new-user-button" class="secondary-button" type="button">
+            + Nou usuari
+          </button>
+        </div>
+
+        <div id="user-list" class="user-list"></div>
+
+        <form id="user-form" class="user-form" hidden>
+          <div class="panel-title">
+            <div>
+              <p class="eyebrow">Nou usuari</p>
+              <h3 id="user-form-title">Afegir accés</h3>
+            </div>
+            <button id="cancel-user-button" class="text-button" type="button">
+              Cancel·lar
+            </button>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              Usuari *
+              <input name="username" required />
+            </label>
+            <label>
+              Contrasenya
+              <input name="password" type="text" />
+            </label>
+            <label>
+              Nom complet
+              <input name="fullName" />
+            </label>
+            <label>
+              Correu corporatiu
+              <input name="email" type="email" />
+            </label>
+            <label>
+              Permís *
+              <select name="permission" required>
+                <option value="NORMAL">Normal</option>
+                <option value="ADMIN">Administrador</option>
+                <option value="SUPER">SUPER</option>
+              </select>
+            </label>
+            <label>
+              Equip *
+              <select name="team" required>
+                <option value="Coordinació">Coordinació</option>
+                <option value="Laura">Laura</option>
+              </select>
+            </label>
+            <label>
+              Visió *
+              <select name="viewMode" required>
+                <option value="Compartida">Tauler compartit</option>
+                <option value="Pròpies">Només tasques pròpies</option>
+                <option value="Perfils">Perfils assignats</option>
+              </select>
+            </label>
+            <label>
+              Nom d’assignació *
+              <input name="assignment" placeholder="Exemple: Joaquim" required />
+            </label>
+          </div>
+          <fieldset id="user-profile-picker" class="user-picker">
+            <legend>Perfils que pot veure</legend>
+            <div></div>
+          </fieldset>
+          <label class="status-toggle user-active-field">
+            <input name="active" type="checkbox" checked />
+            Usuari actiu
+          </label>
+          <p id="user-form-error" class="form-error" role="alert"></p>
+          <button id="save-user-button" class="primary-button compact" type="submit">
+            Guardar usuari
+          </button>
+        </form>
+      </section>
+
+      <section id="admin-profiles-panel" class="admin-panel" hidden>
+        <div class="impact-note">
+          <span aria-hidden="true">i</span>
+          <p>
+            Els perfils sempre pertanyen a Coordinació o Laura. Una acció pot
+            continuar en el perfil, enviar a un altre perfil o tancar la incidència.
+          </p>
+        </div>
+        <div class="panel-title">
+          <div>
+            <h3>Recorreguts actius</h3>
+            <p class="muted">
+              Només SUPER pot crear-los o modificar-los. Els formularis no canvien.
+            </p>
+          </div>
+          <button id="new-profile-button" class="secondary-button" type="button">
+            + Nou perfil
+          </button>
+        </div>
+        <div id="profile-settings-list" class="profile-settings-list"></div>
+
+        <form id="profile-form" class="workflow-form" hidden>
+          <div class="panel-title">
+            <div>
+              <p class="eyebrow">Configuració SUPER</p>
+              <h3 id="profile-form-title">Crear perfil</h3>
+            </div>
+            <button id="cancel-profile-button" class="text-button" type="button">
+              Cancel·lar
+            </button>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              Nom del perfil *
+              <input name="name" placeholder="Exemple: Xarxes" required />
+            </label>
+            <label>
+              Equip responsable *
+              <select name="team" required>
+                <option value="Coordinació">Coordinació</option>
+                <option value="Laura">Laura</option>
+              </select>
+            </label>
+            <label>
+              Què rep? *
+              <input name="entry" placeholder="Exemple: Xarxes" required />
+            </label>
+            <label class="status-toggle workflow-print-toggle">
+              <input name="canPrint" type="checkbox" />
+              Permetre imprimir un lot
+            </label>
+            <label id="print-status-field" hidden>
+              Estat després d’imprimir
+              <input name="printStatus" placeholder="Exemple: Procés" />
+            </label>
+          </div>
+
+          <fieldset class="user-picker">
+            <legend>Usuaris que el poden veure *</legend>
+            <div id="profile-user-picker"></div>
+          </fieldset>
+
+          <div class="workflow-builder">
+            <div>
+              <strong>Accions del perfil</strong>
+              <p class="muted">
+                Les destinacions només es poden triar entre perfils existents.
+              </p>
+            </div>
+            <div id="workflow-action-list"></div>
+            <button id="add-workflow-action" class="ghost-button compact" type="button">
+              + Afegir acció
+            </button>
+          </div>
+
+          <p id="profile-form-error" class="form-error" role="alert"></p>
+          <div class="profile-actions">
+            <button class="primary-button compact" type="submit">
+              Revisar i guardar perfil
+            </button>
+          </div>
+        </form>
+
+        <div class="profile-actions">
+          <button id="restore-profiles-button" class="ghost-button" type="button">
+            Restaurar configuració inicial
+          </button>
+        </div>
+      </section>
+    </dialog>
+
+    <dialog id="impact-dialog" class="impact-dialog">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow warning">Abans d’aplicar</p>
+          <h2>Aquest canvi té conseqüències</h2>
+        </div>
+        <button class="icon-button" data-close-dialog="impact-dialog" type="button">
+          <span class="sr-only">Tancar</span>×
+        </button>
+      </div>
+      <div id="impact-summary" class="impact-summary"></div>
+      <div id="replacement-block" class="replacement-block" hidden>
+        <label>
+          Reassignar les incidències afectades a
+          <select id="replacement-select"></select>
+        </label>
+      </div>
+      <div class="dialog-actions">
+        <button class="ghost-button" data-close-dialog="impact-dialog" type="button">
+          Cancel·lar
+        </button>
+        <button id="confirm-profile-changes" class="danger-button" type="button">
+          Entenc l’impacte, aplicar
+        </button>
+      </div>
+    </dialog>
+
+    <div id="toast-region" class="toast-region" aria-live="polite"></div>
+    <div id="loading-overlay" class="loading-overlay" hidden>
+      <div class="loading-card">
+        <span class="spinner" aria-hidden="true"></span>
+        <strong>Actualitzant el panell…</strong>
+      </div>
+    </div>
+  </body>
 </html>
