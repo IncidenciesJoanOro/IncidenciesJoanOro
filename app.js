@@ -1077,6 +1077,7 @@ async function printCurrentBatch_() {
   popup.opener = null;
   popup.document.write(printDocument_(incidents, state.dashboard.viewLabel));
   popup.document.close();
+  await waitForPrintImages_(popup.document);
   popup.focus();
   popup.print();
   const confirmed = window.confirm(
@@ -1114,6 +1115,8 @@ function printDocument_(incidents, title) {
       .priority{font-weight:700;color:#c4140f}
       h2{font-size:17px;margin:8px 0 3px}
       p{margin:5px 0;line-height:1.4}.comment{background:#f2f3f4;padding:9px;border-radius:6px}
+      .incident-image-link{display:block;margin-top:10px}
+      .incident-image{display:block;max-width:100%;max-height:95mm;object-fit:contain;border:1px solid #d7dadd;border-radius:6px}
       @page{size:A4;margin:14mm}
     </style></head><body>
       <header><h1>${escapeHtml_(title)} · Institut Joan Oró</h1>
@@ -1133,6 +1136,22 @@ function printDocument_(incidents, title) {
         )
         .join("")}
     </body></html>`;
+}
+
+function waitForPrintImages_(document, timeoutMs = 6000) {
+  const images = [...document.images].filter((image) => !image.complete);
+  if (!images.length) return Promise.resolve();
+  const loaded = Promise.all(
+    images.map(
+      (image) =>
+        new Promise((resolve) => {
+          image.addEventListener("load", resolve, { once: true });
+          image.addEventListener("error", resolve, { once: true });
+        }),
+    ),
+  );
+  const timeout = new Promise((resolve) => window.setTimeout(resolve, timeoutMs));
+  return Promise.race([loaded, timeout]);
 }
 
 async function api_(action, payload = {}, options = {}) {
@@ -1194,9 +1213,57 @@ function selectOptions_(values, selected) {
 }
 
 function safeDescription_(value) {
-  return escapeHtml_(value || "")
-    .replace(/&lt;br\s*\/?&gt;/gi, "<br>")
-    .replace(/\n/g, "<br>");
+  const source = String(value || "");
+  const imagePattern = /<img\b[^>]*>/gi;
+  const fragments = [];
+  let cursor = 0;
+  let match;
+
+  while ((match = imagePattern.exec(source))) {
+    fragments.push(formatDescriptionText_(source.slice(cursor, match.index)));
+    const imageUrl = safeLegacyImageUrl_(match[0]);
+    fragments.push(
+      imageUrl
+        ? `<a class="incident-image-link" href="${escapeAttribute_(
+            imageUrl,
+          )}" target="_blank" rel="noopener noreferrer" aria-label="Obrir la imatge adjunta">
+             <img class="incident-image" src="${escapeAttribute_(
+               imageUrl,
+             )}" alt="Imatge adjunta a la incidència">
+           </a>`
+        : formatDescriptionText_(match[0]),
+    );
+    cursor = imagePattern.lastIndex;
+  }
+
+  fragments.push(formatDescriptionText_(source.slice(cursor)));
+  return fragments.join("");
+}
+
+function formatDescriptionText_(value) {
+  return escapeHtml_(value)
+    .replace(/&lt;\/?br\s*\/?&gt;/gi, "<br>")
+    .replace(/\r?\n/g, "<br>");
+}
+
+function safeLegacyImageUrl_(imageTag) {
+  const sourceMatch = String(imageTag).match(
+    /\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'<>`]+))/i,
+  );
+  const rawUrl = (sourceMatch?.[1] || sourceMatch?.[2] || sourceMatch?.[3] || "")
+    .replace(/&amp;/gi, "&")
+    .trim();
+  if (!rawUrl) return "";
+
+  try {
+    const url = new URL(rawUrl);
+    if (url.protocol !== "https:" || url.hostname !== "drive.google.com") return "";
+    if (!["/thumbnail", "/uc"].includes(url.pathname)) return "";
+    if (!url.searchParams.get("id")) return "";
+    return url.href;
+  } catch {
+    return "";
+  }
 }
 
 function formatDateTime_(value) {

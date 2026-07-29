@@ -754,6 +754,26 @@ textarea:hover {
   white-space: pre-line;
 }
 
+.incident-image-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 12px;
+  border-radius: 10px;
+  outline-offset: 3px;
+}
+
+.incident-image {
+  display: block;
+  max-width: min(100%, 680px);
+  max-height: 420px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f4f5f6;
+  object-fit: contain;
+  box-shadow: 0 5px 18px rgb(25 31 36 / 8%);
+}
+
 .incident-meta {
   display: flex;
   flex-wrap: wrap;
